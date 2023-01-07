@@ -20,6 +20,9 @@ mvnw*
 *.iws
 *.iml
 *.ipr
+node
+node_modules
+src/main/resources/static/built
 
 ### NetBeans ###
 /nbproject/private/

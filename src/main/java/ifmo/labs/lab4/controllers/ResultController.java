@@ -9,12 +9,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class Controller {
+public class ResultController {
 
     private final ResultRepository resultRepository;
 
     @Autowired
-    Controller(ResultRepository resultRepository){
+    ResultController(ResultRepository resultRepository){
         this.resultRepository = resultRepository;
     }
 
