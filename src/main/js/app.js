@@ -12,18 +12,18 @@ import {
 const authContext = createContext();
 const useAuth = ()=>{return useContext(authContext);}
 const useProvideAuth = () => {
-    const [isLogged, setIsLogged] = useState(false);
-    const signin = (cb)=>{
-        setIsLogged(true);
+    const [user, setUser] = useState(null);
+    const signin = (user, cb)=>{
+        setUser(user);
         cb();
     };
     const signout = (cb)=>{
-        setIsLogged(false);
+        setUser(null);
         cb();
     };
 
     return {
-      isLogged,
+      user,
       signin,
       signout
     };
@@ -40,7 +40,7 @@ function PrivateRoute({ children, ...rest }) {
         <Route
             {...rest}
             render={({ location }) =>
-                auth.isLogged ? (
+                auth.user ? (
                     children
                 ) : (
                     <Redirect
@@ -117,7 +117,7 @@ const LoginForm = ()=>{
             (response)=>{
                 let result = response.entity === "true";
                 if (result){
-                    auth.signin();
+                    auth.signin(username);
                 } else{
                     auth.signout();
                 }
@@ -166,7 +166,7 @@ const LoginForm = ()=>{
 const AuthHint = ()=>{
   const auth = useAuth();
     return (
-      auth.isLogged ? <h3>You are logged in.</h3> : <h3>You are not logged in.</h3>
+      auth.user ? <h3>You are logged in as {auth.user}.</h3> : <h3>You are not logged in.</h3>
   )
 };
 
@@ -178,6 +178,9 @@ const MainPage = ()=>{
         </div>
     )
 };
+
+
+
 ReactDOM.render(
     <App />,
     document.getElementById("root")

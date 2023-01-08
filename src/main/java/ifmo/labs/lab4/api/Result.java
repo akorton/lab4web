@@ -16,13 +16,16 @@ public class Result {
     private float r;
     private boolean result;
 
+    private String name;
+
     public Result(){};
 
-    public Result(float x, float y, float r){
+    public Result(float x, float y, float r, String name){
         this.x = x;
         this.y = y;
         this.r = r;
         this.result = computeResult(x, y, r);
+        this.name = name;
     }
 
     private boolean computeResult(float x, float y, float r){
@@ -69,17 +72,25 @@ public class Result {
         return id;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Result result1 = (Result) o;
-        return id == result1.id && Float.compare(result1.x, x) == 0 && Float.compare(result1.y, y) == 0 && Float.compare(result1.r, r) == 0 && result == result1.result;
+        return id == result1.id && Float.compare(result1.x, x) == 0 && Float.compare(result1.y, y) == 0 && Float.compare(result1.r, r) == 0 && result == result1.result && Objects.equals(name, result1.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, x, y, r, result);
+        return Objects.hash(id, x, y, r, result, name);
     }
 
     @Override
@@ -90,6 +101,7 @@ public class Result {
                 ", y=" + y +
                 ", r=" + r +
                 ", result=" + result +
+                ", name='" + name + '\'' +
                 '}';
     }
 }
