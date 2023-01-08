@@ -3,7 +3,7 @@
     justify-content: space-between;
     align-items: center;
     flex-direction: column;
-    gap: 10%;
+    gap: 20px;
     height: 100%;
     margin: 5%;
 }
@@ -49,9 +49,6 @@ label {
     justify-content: space-between;
     width: 100%;
 }
-body{
-    height: 90vh;
-}
 #input-wrap{
     display: flex;
     justify-content: flex-start;
@@ -59,4 +56,7 @@ body{
 }
 .input{
     width:100%;
+}
+#canvas .p-datatable{
+    overflow: scroll;
 }

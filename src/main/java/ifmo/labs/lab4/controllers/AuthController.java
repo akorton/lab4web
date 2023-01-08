@@ -42,7 +42,7 @@ public class AuthController {
         Optional<User> possibleUser = userRepository.findById(name);
         if (possibleUser.isEmpty()) return false;
         User user = possibleUser.get();
-        return user.getPassword().equals(passwd);
+        return user.getPassword().strip().equals(passwd);
     }
 
     private boolean addUser(String name, String passwd){

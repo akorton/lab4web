@@ -13,6 +13,7 @@ import {Slider} from 'primereact/slider';
 import {InputText} from 'primereact/inputtext';
 import {DataTable} from "primereact/datatable";
 import {Column} from "primereact/column";
+import {Button} from "primereact/button";
 
 const authContext = createContext();
 const useAuth = ()=>{return useContext(authContext);}
@@ -57,6 +58,31 @@ function PrivateRoute({ children, ...rest }) {
         />
     );
 }
+
+
+const canvasContext = createContext();
+const useCanvas = ()=>{return useContext(canvasContext);}
+const useProvideCanvas = ()=>{
+    const [x, setX] = useState(0);
+    const [y, setY] = useState(0);
+    const [r, setR] = useState(0);
+    const [results, setResults] = useState([]);
+    return {
+        x, setX,
+        y, setY,
+        r, setR,
+        results, setResults
+    }
+};
+const ProvideCanvas = ({children})=>{
+    const canvas = useProvideCanvas();
+    return (
+        <canvasContext.Provider value={canvas}>
+            {children}
+        </canvasContext.Provider>
+    )
+}
+
 const App = ()=>{
     return (
         <ProvideAuth>
@@ -66,7 +92,9 @@ const App = ()=>{
                         <LoginPage />
                     </Route>
                     <PrivateRoute exact path="/main">
-                        <MainPage />
+                        <ProvideCanvas>
+                            <MainPage />
+                        </ProvideCanvas>
                     </PrivateRoute>
                 </Switch>
             </Router>
@@ -107,34 +135,48 @@ const Header = () => {
         </div>
     )
 };
-
+const hash = (string) =>{
+    const utf8 = new TextEncoder().encode(string);
+    return crypto.subtle.digest('SHA-256', utf8).then((hashBuffer) => {
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hashHex = hashArray
+            .map((bytes) => bytes.toString(16).padStart(2, '0'))
+            .join('');
+        return hashHex;
+    });
+}
 const LoginForm = ()=>{
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [registered, setRegistered] = useState(false);
     const [registeredClicked, setRegisteredClicked] = useState(false);
     const auth = useAuth();
+
     const login = (e)=>{
-        rest(`/api/login?username=${username}&password=${password}`).then(
-            (response)=>{
-                let result = response.entity === "true";
-                if (result){
-                    auth.signin(username);
-                } else{
-                    auth.signout();
+        hash(password).then((hashedPasswd)=>{
+            rest(`/api/login?username=${username}&password=${hashedPasswd}`).then(
+                (response)=>{
+                    let result = response.entity === "true";
+                    if (result){
+                        auth.signin(username);
+                    } else{
+                        auth.signout();
+                    }
                 }
-            }
-        );
+            );
+        });
     }
     const register = (e)=>{
-        rest(`/api/register?username=${username}&password=${password}`).then(
-            (response)=>{
-                let result = response.entity === "true";
-                setRegisteredClicked(true);
-                if (result) setRegistered(true);
-                else setRegistered(false);
-            }
-        );
+        hash(password).then((hashedPassword)=>{
+            rest(`/api/register?username=${username}&password=${hashedPassword}`).then(
+                (response)=>{
+                    let result = response.entity === "true";
+                    setRegisteredClicked(true);
+                    if (result) setRegistered(true);
+                    else setRegistered(false);
+                }
+            );
+        });
     }
     const onChangeUsername = (event)=>{
         setUsername(event.target.value);
@@ -183,9 +225,29 @@ const MainPage = ()=>{
             <div id="input-wrap">
                 <Inputs />
             </div>
+            <SubmitButton />
         </>
     )
 };
+
+const SubmitButton = ()=>{
+    const auth = useAuth();
+    const canvas = useCanvas();
+    const onClick = ()=>{
+        rest({
+            method: "POST",
+            path: "/api/results",
+            entity: JSON.stringify({x: canvas.x, y: canvas.y, r: canvas.r, name: auth.user}),
+            headers: {'Content-Type': 'application/json'}
+        }).then((data)=>{
+            let resultValue = JSON.stringify(JSON.parse(data.entity).result);
+            canvas.setResults([...canvas.results, {x: canvas.x, y: canvas.y, r: canvas.r, name: auth.user, result: resultValue}]);
+        })
+    }
+    return (
+        <Button onClick={onClick}>Submit</Button>
+    )
+}
 
 const Canvas = () => {
     return (
@@ -194,29 +256,26 @@ const Canvas = () => {
 };
 
 const Inputs = ()=>{
-    const [x, setX] = useState(0);
-    const [y, setY] = useState(0);
-    const [r, setR] = useState(0);
-
+    const canvas = useCanvas();
     const validateR = (r)=>{
         return r >= 0;
     }
     const validateY = (y)=>{
-        return (+y || y === "-") && (y.length <= 6);
+        return ((+y || y === "-") && (y.length <= 6)) || (y.length === 0);
     }
     return (
         <div id="inputs">
             <div className="input">
-                <h5>X: {x}</h5>
-                <Slider value={x} onChange={(e)=>setX(e.value)} step={1} min={-5} max={3}/>
+                <h5>X: {canvas.x}</h5>
+                <Slider value={canvas.x} onChange={(e)=>canvas.setX(e.value)} step={1} min={-5} max={3}/>
             </div>
             <div className="input">
-                <h5>Y: {y}</h5>
-                <InputText value={y} onChange={(e)=>{if (validateY(e.target.value)) setY(e.target.value)}} />
+                <h5>Y: {canvas.y}</h5>
+                <InputText value={canvas.y} onChange={(e)=>{if (validateY(e.target.value)) canvas.setY(e.target.value)}} />
             </div>
             <div className="input">
-                <h5>R: {r}</h5>
-                <Slider value={r} onChange={(e)=>{if (validateR(e.value)) setR(e.value)}} step={1} min={-5} max={3}/>
+                <h5>R: {canvas.r}</h5>
+                <Slider value={canvas.r} onChange={(e)=>{if (validateR(e.value)) canvas.setR(e.value)}} step={1} min={-5} max={3}/>
             </div>
         </div>
     )
@@ -224,21 +283,25 @@ const Inputs = ()=>{
 
 const getResults = async ()=>{
     let results;
-    await rest("/api/results").then(
+    await rest({method:"GET", path:"/api/results"}).then(
         (response)=>{
             results = JSON.parse(response.entity);
+            results.every((item)=>item.name = item.name.trim());
         }
     )
     return results;
 }
 
 const Table = () => {
-    const [results, setResults] = useState([]);
+    const canvas = useCanvas();
+    const auth = useAuth();
     useEffect(()=>{
-        getResults().then((data)=>setResults(data));
+        getResults().then(
+            (data)=>canvas.setResults(data.filter((item)=>item.name===auth.user))
+        );
     }, []);
     return (
-        <DataTable value={results}>
+        <DataTable value={canvas.results}>
             <Column field="x" header="x"/>
             <Column field="y" header="y"/>
             <Column field="r" header="r"/>
@@ -246,19 +309,6 @@ const Table = () => {
         </DataTable>
     )
 }
-
-const TableElement = (props) => {
-    return (
-        <tr>
-            <td>{props.x}</td>
-            <td>{props.y}</td>
-            <td>{props.r}</td>
-            <td>{JSON.stringify(props.result)}</td>
-        </tr>
-    )
-}
-
-
 
 ReactDOM.render(
     <App />,
