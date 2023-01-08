@@ -71,7 +71,6 @@ const App = ()=>{
     )
 };
 
-
 const LoginPage = ()=>{
     return (
         <>
@@ -173,11 +172,64 @@ const AuthHint = ()=>{
 const MainPage = ()=>{
     return (
         <div>
-            <h1>Main page</h1>
             <Link to="/">Login Page</Link>
+            <div>
+                <Canvas />
+                <Table />
+            </div>
         </div>
     )
 };
+
+const Canvas = () => {
+    return (
+        <></>
+    )
+}
+
+const getResults = async ()=>{
+    let results;
+    await rest("/api/results").then(
+        (response)=>{
+            results = JSON.parse(response.entity);
+        }
+    )
+    return results;
+}
+
+const Table = () => {
+    const [results, setResults] = useState([]);
+    setInterval(()=>{
+        getResults().then((result)=>setResults(result));
+    }, 10000);
+    return (
+        <table>
+            <tbody>
+                <tr>
+                    <th>x</th>
+                    <th>y</th>
+                    <th>r</th>
+                    <th>result</th>
+                </tr>
+                {results.map((value, index, array)=> {
+                    return <TableElement key={index} x={value.x} y={value.y} r={value.r} result={value.result}/>
+                })}
+            </tbody>
+        </table>
+    )
+}
+
+const TableElement = (props) => {
+    console.log(props.result);
+    return (
+        <tr>
+            <td>{props.x}</td>
+            <td>{props.y}</td>
+            <td>{props.r}</td>
+            <td>{JSON.stringify(props.result)}</td>
+        </tr>
+    )
+}
 
 
 
