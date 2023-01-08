@@ -189,15 +189,15 @@ const LoginForm = ()=>{
             <div id="login">
                 <div className="login-element">
                     <label>Input username:</label>
-                    <input type="text" onChange={onChangeUsername} value={username}/>
+                    <InputText onChange={onChangeUsername} value={username}/>
                 </div>
                 <div className="login-element">
                     <label>Input password</label>
-                    <input type="password" onChange={onChangePassword} value={password}/>
+                    <InputText onChange={onChangePassword} value={password}/>
                 </div>
                 <div id="buttons">
-                    <button onClick={login}>Login</button>
-                    <button onClick={register}>Register</button>
+                    <Button onClick={login}>Login</Button>
+                    <Button onClick={register}>Register</Button>
                 </div>
                 <div id="extra-text">
                     {registered ? <h3>Successfully registered!</h3> : (registeredClicked ? <h3>Registration was not<br /> successful!</h3> : <></>)}
@@ -215,9 +215,10 @@ const AuthHint = ()=>{
 };
 
 const MainPage = ()=>{
+    const auth = useAuth();
     return (
         <>
-            <Link to="/">Login Page</Link>
+            <Button onClick={auth.signout}>Sign out</Button>
             <div id="main-div">
                 <Canvas />
                 <Table />

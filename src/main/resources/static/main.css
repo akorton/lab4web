@@ -5,7 +5,7 @@
     flex-direction: column;
     gap: 20px;
     height: 100%;
-    margin: 5%;
+    margin: 3%;
 }
 
 #header {
@@ -57,6 +57,7 @@ label {
 .input{
     width:100%;
 }
-#canvas .p-datatable{
+#main-div .p-datatable{
     overflow: scroll;
+    height: 50vh;
 }
