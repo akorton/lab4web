@@ -1,0 +1,27 @@
+#root {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+#header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 50px;
+}
+
+#login {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.login-element {
+    display: flex;
+    flex-direction: column;
+}
+label {
+    font-size: 20px;
+}
