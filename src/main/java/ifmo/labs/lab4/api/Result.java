@@ -29,9 +29,20 @@ public class Result {
     }
 
     private boolean computeResult(float x, float y, float r){
-        return false;
+        return computeCircleResult(x, y, r) || computeSquareResult(x, y, r) || computeTriangleResult(x, y, r);
     }
 
+    private boolean computeTriangleResult(float x, float y, float r){
+        return x >= 0 && y <= 0 && y >= x - r / 2;
+    }
+
+    private boolean computeSquareResult(float x, float y, float r){
+        return x <= 0 && y >= 0 && x >= -r && y <= r;
+    }
+
+    private boolean computeCircleResult(float x, float y, float r){
+        return x >= 0 && y >= 0 && x*x+y*y <= r*r/4;
+    }
     public void setId(long id) {
         this.id = id;
     }
