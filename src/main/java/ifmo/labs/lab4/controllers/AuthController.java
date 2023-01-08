@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class LoginController {
+public class AuthController {
 
-    private final Logger logger = LoggerFactory.getLogger(LoginController.class);
+    private final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     @RequestMapping(method = RequestMethod.GET, value="/api/login")
     public boolean login(@RequestParam String username, @RequestParam String password){
@@ -19,7 +19,17 @@ public class LoginController {
         return checkResult;
     }
 
+
+    @RequestMapping(method = RequestMethod.GET, value="/api/register")
+    public boolean register(@RequestParam String username, @RequestParam String password){
+        boolean checkResult = addUser(username, password);
+        logger.info("User with username <%s> and password <%s>".formatted(username, password) + (checkResult ? " successfully" : "was not") +  " registered.");
+        return checkResult;
+    }
+
     private boolean checkUser(String name, String passwd){
         return !name.isEmpty() && !passwd.isEmpty();
     }
+
+    private boolean addUser(String name, String passwd){ return !name.isEmpty() && !passwd.isEmpty();}
 }

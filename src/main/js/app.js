@@ -109,8 +109,10 @@ const Header = () => {
 const LoginForm = ()=>{
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const [registered, setRegistered] = useState(false);
+    const [registeredClicked, setRegisteredClicked] = useState(false);
     const auth = useAuth();
-    const onSubmit = (e)=>{
+    const login = (e)=>{
         rest(`/api/login?username=${username}&password=${password}`).then(
             (response)=>{
                 let result = response.entity === "true";
@@ -121,7 +123,16 @@ const LoginForm = ()=>{
                 }
             }
         );
-        e.preventDefault();
+    }
+    const register = (e)=>{
+        rest(`/api/register?username=${username}&password=${password}`).then(
+            (response)=>{
+                let result = response.entity === "true";
+                setRegisteredClicked(true);
+                if (result) setRegistered(true);
+                else setRegistered(false);
+            }
+        );
     }
     const onChangeUsername = (event)=>{
         setUsername(event.target.value);
@@ -131,7 +142,7 @@ const LoginForm = ()=>{
     }
     return (
         <>
-            <form id="login" onSubmit={onSubmit}>
+            <div id="login">
                 <div className="login-element">
                     <label>Input username:</label>
                     <input type="text" onChange={onChangeUsername} value={username}/>
@@ -140,8 +151,14 @@ const LoginForm = ()=>{
                     <label>Input password</label>
                     <input type="password" onChange={onChangePassword} value={password}/>
                 </div>
-                <button type="submit">Login</button>
-            </form>
+                <div id="buttons">
+                    <button onClick={login}>Login</button>
+                    <button onClick={register}>Register</button>
+                </div>
+                <div id="extra-text">
+                    {registered ? <h3>Successfully registered!</h3> : (registeredClicked ? <h3>Registration was not<br /> successful!</h3> : <></>)}
+                </div>
+            </div>
         </>
     )
 };
