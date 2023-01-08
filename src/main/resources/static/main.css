@@ -1,8 +1,11 @@
 #root {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
     flex-direction: column;
+    gap: 10%;
+    height: 100%;
+    margin: 5%;
 }
 
 #header {
@@ -33,4 +36,27 @@ label {
 
 #extra-text {
     text-align: center;
+}
+#inputs{
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    gap: 20%;
+}
+
+#main-div{
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+body{
+    height: 90vh;
+}
+#input-wrap{
+    display: flex;
+    justify-content: flex-start;
+    width:100%;
+}
+.input{
+    width:100%;
 }

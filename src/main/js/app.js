@@ -1,4 +1,4 @@
-import React, {createContext, useContext, useState} from 'react';
+import React, {createContext, useContext, useEffect, useState} from 'react';
 import ReactDOM from 'react-dom';
 import rest from 'rest';
 import {
@@ -9,17 +9,20 @@ import {
     Link
 } from "react-router-dom";
 
+import {Slider} from 'primereact/slider';
+import {InputText} from 'primereact/inputtext';
+import {DataTable} from "primereact/datatable";
+import {Column} from "primereact/column";
+
 const authContext = createContext();
 const useAuth = ()=>{return useContext(authContext);}
 const useProvideAuth = () => {
     const [user, setUser] = useState(null);
-    const signin = (user, cb)=>{
+    const signin = (user)=>{
         setUser(user);
-        cb();
     };
-    const signout = (cb)=>{
+    const signout = ()=>{
         setUser(null);
-        cb();
     };
 
     return {
@@ -171,19 +174,51 @@ const AuthHint = ()=>{
 
 const MainPage = ()=>{
     return (
-        <div>
+        <>
             <Link to="/">Login Page</Link>
-            <div>
+            <div id="main-div">
                 <Canvas />
                 <Table />
             </div>
-        </div>
+            <div id="input-wrap">
+                <Inputs />
+            </div>
+        </>
     )
 };
 
 const Canvas = () => {
     return (
-        <></>
+        <canvas id="canvas"/>
+    )
+};
+
+const Inputs = ()=>{
+    const [x, setX] = useState(0);
+    const [y, setY] = useState(0);
+    const [r, setR] = useState(0);
+
+    const validateR = (r)=>{
+        return r >= 0;
+    }
+    const validateY = (y)=>{
+        return (+y || y === "-") && (y.length <= 6);
+    }
+    return (
+        <div id="inputs">
+            <div className="input">
+                <h5>X: {x}</h5>
+                <Slider value={x} onChange={(e)=>setX(e.value)} step={1} min={-5} max={3}/>
+            </div>
+            <div className="input">
+                <h5>Y: {y}</h5>
+                <InputText value={y} onChange={(e)=>{if (validateY(e.target.value)) setY(e.target.value)}} />
+            </div>
+            <div className="input">
+                <h5>R: {r}</h5>
+                <Slider value={r} onChange={(e)=>{if (validateR(e.value)) setR(e.value)}} step={1} min={-5} max={3}/>
+            </div>
+        </div>
     )
 }
 
@@ -199,28 +234,20 @@ const getResults = async ()=>{
 
 const Table = () => {
     const [results, setResults] = useState([]);
-    setInterval(()=>{
-        getResults().then((result)=>setResults(result));
-    }, 10000);
+    useEffect(()=>{
+        getResults().then((data)=>setResults(data));
+    }, []);
     return (
-        <table>
-            <tbody>
-                <tr>
-                    <th>x</th>
-                    <th>y</th>
-                    <th>r</th>
-                    <th>result</th>
-                </tr>
-                {results.map((value, index, array)=> {
-                    return <TableElement key={index} x={value.x} y={value.y} r={value.r} result={value.result}/>
-                })}
-            </tbody>
-        </table>
+        <DataTable value={results}>
+            <Column field="x" header="x"/>
+            <Column field="y" header="y"/>
+            <Column field="r" header="r"/>
+            <Column field="result" header="result"/>
+        </DataTable>
     )
 }
 
 const TableElement = (props) => {
-    console.log(props.result);
     return (
         <tr>
             <td>{props.x}</td>
